@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -36,17 +38,25 @@ public class UserController {
     }
 
     @RequestMapping("/forms.do")
-    public String forms (User user, HashMap<String, Object> map,HttpServletRequest request) throws MyException{
+    public String forms (User user, HashMap<String, Object> map,HttpServletRequest request, HttpSession session) throws MyException{
         List<User> userList = userService.findByEmail(user.getEmail());
         user.setPassword(MD5.getInstance().getMD5ofStr(user.getPassword()+userList.get(0).getId()));
         user = this.userService.findIdAndPassword(user);
         if(null==user){
                 throw new MyException("用户不存在");
         }
-        request.getSession().setAttribute("user",user);
+        session.setAttribute("user",user);
         map.put("user",user);
         return "success/success";
     }
+    @RequestMapping(value = "/test.do" )
+    public String test (User user, HashMap<String, Object> map,HttpServletRequest request, HttpSession session) throws MyException{
+        logger.info("============user================"+session.getAttribute("user"));
+        user = (User) session.getAttribute("user");
+        map.put("user",user);
+        return "success/test";
+    }
+
 
     @RequestMapping("/register.do")
     public String register (User user, String rpassword) throws MyException{
@@ -86,4 +96,17 @@ public class UserController {
         return msg;
     }
 
+    @RequestMapping("/all.do")
+    public String all () throws MyException{
+        return "success/findAll";
+    }
+
+    @RequestMapping(value = "/findAllUser.do",method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String,Object> findAllUser () throws MyException{
+        Map<String, Object> map=new HashMap<String, Object>();
+        List<User> userList = userService.findAllUser();
+        map.put("userList",userList);
+        return map;
+    }
 }

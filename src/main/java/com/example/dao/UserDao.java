@@ -10,4 +10,5 @@ public interface UserDao {
     String findId();
     int insertSelective(User user);
     List<User> findByEmail(String email);
+    List<User> findAllUser();
 }
