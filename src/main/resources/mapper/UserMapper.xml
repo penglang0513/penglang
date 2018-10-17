@@ -7,15 +7,22 @@
         <result column="password" property="password" jdbcType="VARCHAR" />
         <result column="age" property="age" jdbcType="INTEGER" />
         <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-        id, username, password, age ,email
+        id, username, password, age ,email,state
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
         select
         <include refid="Base_Column_List" />
         from userpl
         where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findAllUser" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from userpl
     </select>
 
     <select id="findId" resultType="java.lang.String" >

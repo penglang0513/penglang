@@ -11,6 +11,7 @@ public class User {
 
     private String email;
 
+    private  String state;
 
     public String getId() {
         return id;
@@ -50,5 +51,13 @@ public class User {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

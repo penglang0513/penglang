@@ -8,7 +8,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication
 @MapperScan("com.example.dao")
 public class PenglangApplication extends SpringBootServletInitializer {
-
     public static void main(String[] args) {
         SpringApplication.run(PenglangApplication.class, args);
     }

@@ -14,4 +14,6 @@ public interface UserService {
     public int insertSelective(User user);
 
     public List<User> findByEmail(String email);
+
+    public List<User> findAllUser();
 }
