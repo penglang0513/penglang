@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @EnableAutoConfiguration
-@RequestMapping("/testboot")
+@RequestMapping("/testBoot")
 public class TestBootController {
 
     @RequestMapping("getuser")

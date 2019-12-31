@@ -1,51 +1,31 @@
 package com.example.entity;
 
 public class ErrorInfo<T> {
-    public static final Integer OK = 0;
-    public static final Integer ERROR = 100;
+    private boolean success;
+    private String msg;
+    private Object errors;
 
-    private Integer code;
-    private String message;
-    private String url;
-    private T data;
-
-    public static Integer getOK() {
-        return OK;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public static Integer getERROR() {
-        return ERROR;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
-    public Integer getCode() {
-        return code;
+    public String getMsg() {
+        return msg;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
-    public String getMessage() {
-        return message;
+    public Object getErrors() {
+        return errors;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
+    public void setErrors(Object errors) {
+        this.errors = errors;
     }
 }

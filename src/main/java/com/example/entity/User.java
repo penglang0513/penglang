@@ -1,6 +1,8 @@
 package com.example.entity;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String id;
 
     private String userName;
@@ -12,6 +14,8 @@ public class User {
     private String email;
 
     private  String state;
+
+    private String level;
 
     public String getId() {
         return id;
@@ -59,5 +63,26 @@ public class User {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", age=" + age +
+                ", email='" + email + '\'' +
+                ", state='" + state + '\'' +
+                ", level='" + level + '\'' +
+                '}';
     }
 }

@@ -2,53 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.dao.UserDao" >
     <resultMap id="BaseResultMap" type="com.example.entity.User" >
-        <id column="id" property="id" jdbcType="VARCHAR" />
+        <id column="cifseq" property="id" jdbcType="VARCHAR" />
         <result column="username" property="userName" jdbcType="VARCHAR" />
         <result column="password" property="password" jdbcType="VARCHAR" />
         <result column="age" property="age" jdbcType="INTEGER" />
         <result column="email" property="email" jdbcType="VARCHAR" />
         <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="level" property="level" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-        id, username, password, age ,email,state
+        cifseq, username, password, age ,email,state,level
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
         select
         <include refid="Base_Column_List" />
-        from userpl
-        where id = #{id,jdbcType=VARCHAR}
+        from ecusr
+        where cifseq = #{id,jdbcType=VARCHAR} and state='N'
     </select>
 
     <select id="findAllUser" resultMap="BaseResultMap" >
         select
         <include refid="Base_Column_List" />
-        from userpl
+        from ecusr where state='N'
     </select>
 
     <select id="findId" resultType="java.lang.String" >
-        select max(id) from userpl
+        select max(cifseq) from ecusr
     </select>
 
     <select id="findByEmail" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
         <include refid="Base_Column_List" />
-        from userpl
-        where email = #{email,jdbcType=VARCHAR}
+        from ecusr
+        where email = #{email,jdbcType=VARCHAR} and state='N'
     </select>
 
     <select id="findIdAndPassword" resultMap="BaseResultMap" parameterType="com.example.entity.User">
         select
         <include refid="Base_Column_List"/>
-        from userpl
+        from ecusr
         where email = #{email,jdbcType=VARCHAR}
         and password  = #{password,jdbcType=VARCHAR}
+        and state = 'N'
     </select>
 
     <insert id="insertSelective" parameterType="com.example.entity.User" >
-        insert into userpl
+        insert into ecusr
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="id != null" >
-                id,
+                cifseq,
             </if>
             <if test="userName != null" >
                 username,
@@ -62,6 +64,10 @@
             <if test="email != null" >
                 email,
             </if>
+            state,
+            level,
+            createtime,
+            updatetime,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="id != null" >
@@ -79,6 +85,188 @@
             <if test="email != null" >
                 #{email,jdbcType=VARCHAR},
             </if>
+            'N',
+            '0',
+            NOW(),
+            NOW(),
         </trim>
     </insert>
+
+    <select id="findLevel" parameterType="java.lang.String" resultType="java.lang.String">
+        select level from ecusr where username=#{username} and state='N'
+    </select>
+
+    <select id="findUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select cifseq from ecusr where email=#{email} and state='N'
+    </select>
+
+    <insert id="addFile" parameterType="java.util.Map">
+        insert into fileinfo
+        (fileid,fileseq,filename,state,path,createtime,updatetime)
+        values (
+        #{fileId},#{model},#{fileName},'N',#{filePath},NOW(),NOW()
+        )
+    </insert>
+
+    <resultMap id="findSCResultMap" type="java.util.Map" >
+        <result column="fileseq" property="ftId" jdbcType="VARCHAR" />
+        <result column="typename" property="ftName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="findSC" parameterType="java.lang.String" resultMap="findSCResultMap">
+        select fileseq,typename from filetype where cifseq=#{userId} and state='N'
+    </select>
+
+    <resultMap id="findShouCResultMap" type="java.util.Map" >
+        <result column="username" property="userName" jdbcType="VARCHAR" />
+        <result column="filename" property="fileName" jdbcType="VARCHAR" />
+        <result column="path" property="filePath" jdbcType="VARCHAR" />
+        <result column="createtime" property="fileTime" jdbcType="DATE" />
+        <result column="fileid" property="fileid" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="findShouC" parameterType="java.util.Map" resultMap="findShouCResultMap">
+       select a.username,c.filename,c.path,c.createtime,c.fileid
+       from
+       ecusr a,filetype b,fileinfo c
+       where
+       a.cifseq=b.cifseq AND b.fileseq = c.fileseq AND a.cifseq=#{userId} AND b.fileseq = #{fileId} AND c.state='N' and b.state='N'
+
+    </select>
+
+    <resultMap id="findFtByNameResultMap" type="java.util.Map">
+        <result column="typename" property="ftName" jdbcType="VARCHAR" />
+        <result column="cifseq" property="userId" jdbcType="VARCHAR" />
+        <result column="fileseq" property="fileseq" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="findFtByName" parameterType="java.util.Map" resultMap="findFtByNameResultMap">
+        select
+        d.typename,d.cifseq,d.fileseq
+        from
+        filetype d
+        where
+        d.cifseq=#{userId} and d.typename=#{ftName} and state='N'
+    </select>
+
+    <insert id="addFz" parameterType="java.util.Map">
+        insert into filetype
+        (cifseq,fileseq,typename,state,createtime,updatetime)
+        values (
+        #{userId},#{ftId},#{ftName},'N',NOW(),NOW()
+        )
+    </insert>
+
+    <select id="findFileTypeName" parameterType="java.lang.String" resultType="java.lang.String">
+        select typename from filetype where fileseq=#{model} and state='N'
+    </select>
+
+    <resultMap id="findNoteBookByCifSeqResultMap" type="java.util.Map">
+        <result column="cifseq" property="cifseq" jdbcType="VARCHAR" />
+        <result column="nbseq" property="nbseq" jdbcType="VARCHAR" />
+        <result column="nbname" property="nbname" jdbcType="VARCHAR" />
+        <result column="nbstate" property="nbstate" jdbcType="VARCHAR" />
+        <result column="nbcreatetime" property="nbcreatetime" jdbcType="DATE" />
+        <result column="nbupdatetime" property="nbupdatetime" jdbcType="DATE" />
+    </resultMap>
+
+    <select id="findNoteBookByCifSeq" parameterType="java.util.Map" resultMap="findNoteBookByCifSeqResultMap">
+        select
+        d.cifseq,d.nbseq,d.nbname,d.nbstate,d.nbcreatetime,d.nbupdatetime
+        from
+        notebook d
+        where
+        d.cifseq=#{cifseq} and d.nbstate='N'
+    </select>
+
+    <select id="findNoteBookByName" parameterType="java.util.Map" resultType="java.lang.String">
+        select nbseq from notebook where cifseq=#{cifseq} and nbname = #{nbname} and nbstate='N'
+    </select>
+
+    <insert id="addNoteBook" parameterType="java.util.Map">
+        insert into notebook
+        (cifseq,nbseq,nbname,nbstate,nbcreatetime,nbupdatetime)
+        values (
+        #{cifseq},#{nbseq},#{nbname},'N',NOW(),NOW()
+        )
+    </insert>
+
+    <insert id="addNote" parameterType="java.util.Map">
+        insert into note
+        (noteid,nbseq,notename,notecontent,notestate,notecreatetime,noteupdatetime)
+        values (
+        #{noteid},#{nbseq},#{notename},#{notecontent},'N',NOW(),NOW()
+        )
+    </insert>
+
+    <resultMap id="findNoteBySeqResultMap" type="java.util.Map">
+        <result column="noteid" property="noteid" jdbcType="VARCHAR" />
+        <result column="nbseq" property="nbseq" jdbcType="VARCHAR" />
+        <result column="notename" property="notename" jdbcType="VARCHAR" />
+        <result column="notecontent" property="notecontent" jdbcType="VARCHAR" />
+        <result column="notestate" property="notestate" jdbcType="VARCHAR" />
+        <result column="notecreatetime" property="notecreatetime" jdbcType="DATE" />
+        <result column="noteupdatetime" property="noteupdatetime" jdbcType="DATE" />
+    </resultMap>
+
+    <select id="findNoteBySeq" parameterType="java.util.Map" resultMap="findNoteBySeqResultMap">
+        select
+        d.noteid,d.nbseq,d.notename,d.notecontent,d.notestate,d.notecreatetime,d.noteupdatetime
+        from
+        note d
+        where
+        d.nbseq=#{nbseq} and d.notestate='N'
+    </select>
+
+
+    <select id="findNoteById" parameterType="java.util.Map" resultMap="findNoteBySeqResultMap">
+        select
+        d.noteid,d.nbseq,d.notename,d.notecontent,d.notestate,d.notecreatetime,d.noteupdatetime
+        from
+        note d
+        where
+        d.noteid=#{noteid} and d.notestate='N'
+    </select>
+    <update id="updateNote" parameterType="java.util.Map">
+        update note set notecontent = #{notecontent},noteupdatetime=NOW() where noteid=#{noteid}
+    </update>
+
+    <update id="updateFileInfoState" parameterType="java.util.Map">
+        update fileinfo set state = 'C',updatetime=NOW() where fileid=#{fileId}
+    </update>
+
+    <resultMap id="findFileBySeqResultMap" type="java.util.Map">
+        <result column="fileid" property="fileid" jdbcType="VARCHAR" />
+        <result column="fileseq" property="fileseq" jdbcType="VARCHAR" />
+        <result column="filename" property="filename" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="path" property="path" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="findFileBySeq" parameterType="java.util.Map" resultMap="findFileBySeqResultMap">
+        select
+        d.fileid,d.fileseq,d.filename,d.state,d.path
+        from
+        fileinfo d
+        where
+        d.fileseq=#{fileseq} and d.state='N'
+    </select>
+
+    <update id="updateFileInfoStateByseq" parameterType="java.util.Map">
+        update fileinfo set state = 'C',updatetime=NOW() where fileseq=#{fileseq}
+    </update>
+
+    <update id="updateFileTypeStateByseq" parameterType="java.util.Map">
+        update filetype set state = 'C',updatetime=NOW() where fileseq=#{fileseq}
+    </update>
+
+    <update id="updateNoteByNoteId" parameterType="java.util.Map">
+        update note set notestate = 'C',noteupdatetime=NOW() where noteid=#{noteid}
+    </update>
+    <update id="updateNoteByNbseq" parameterType="java.util.Map">
+        update note set notestate = 'C',noteupdatetime=NOW() where nbseq=#{nbseq}
+    </update>
+    <update id="updateNoteBookByNbseq" parameterType="java.util.Map">
+        update notebook set nbstate = 'C',nbupdatetime=NOW() where nbseq=#{nbseq}
+    </update>
 </mapper>
